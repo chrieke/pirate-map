@@ -168,9 +168,11 @@ def render(seed=None):
     return surface
 
 if __name__ == '__main__':
-    for seed in range(100):
+    for seed in range(3):
         print(seed)
-        surface = render(seed)
-        out_dir = Path.cwd() / "images"
+
+        out_dir = Path.cwd().parent / "images"
         out_dir.mkdir(parents=True, exist_ok=True)
-        surface.write_to_png(str(out_dir / f'out{idx}.png'))
+
+        surface = render(seed)
+        surface.write_to_png(str(out_dir / f'out{seed}.png'))
