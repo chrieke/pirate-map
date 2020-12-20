@@ -1,4 +1,7 @@
-from alpha_shape import alpha_shape
+from pathlib import Path
+import math
+import random
+
 from colour import Color
 from poisson_disc import poisson_disc
 from shapely.geometry import Polygon, MultiPolygon, Point
@@ -6,9 +9,6 @@ from xkcd import xkcdify
 import cairocffi as cairo
 import graph
 import layers
-import math
-import noise
-import random
 
 def make_layer():
     x = layers.Noise(8).add(layers.Constant(0.6)).clamp()
@@ -171,4 +171,6 @@ if __name__ == '__main__':
     for seed in range(100):
         print(seed)
         surface = render(seed)
-        surface.write_to_png('out%04d.png' % seed)
+        out_dir = Path.cwd() / "images"
+        out_dir.mkdir(parents=True, exist_ok=True)
+        surface.write_to_png(str(out_dir / f'out{idx}.png'))
