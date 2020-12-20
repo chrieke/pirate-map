@@ -36,8 +36,9 @@ def render_mark(dc, x, y):
     dc.move_to(x - n, y + n)
     dc.line_to(x + n, y - n)
 
-def render_compass(dc):
+def render_compass(dc, scale=1):
     w, h = 4, 32
+    w, h = w*scale, h*scale
     dc.line_to(-w, 0)
     dc.line_to(0, h)
     dc.line_to(w, 0)
@@ -90,10 +91,10 @@ def find_path(layer, points, threshold):
         if path:
             return path
 
-def render(seed=None, size=512):
+def render(seed=None, size=512, scale=2, display_which=["Sand", "Grass", "Gravel"], sand_area=-4, grass_area=-8, gravel_area=-12):
+    # order: sand, grass, gravel
     random.seed(seed)
     width = height = size
-    scale = 2
     surface = cairo.ImageSurface(cairo.FORMAT_RGB24,
         width * scale, height * scale)
     dc = cairo.Context(surface)
@@ -101,13 +102,14 @@ def render(seed=None, size=512):
     dc.set_line_join(cairo.LINE_JOIN_ROUND)
     dc.scale(scale, scale)
     layer = make_layer()
-    # layer.save('layer.png', 0, 0, width, height)
+
     points = poisson_disc(0, 0, width, height, 8, 16)
-    shape1 = layer.alpha_shape(points, 0.1, 1, 0.1).buffer(-4).buffer(4)
-    shape2 = layer.alpha_shape(points, 0.3, 1, 0.1).buffer(-8).buffer(4)
-    shape3 = layer.alpha_shape(points, 0.12, 0.28, 0.1).buffer(-12).buffer(4)
+    sand_shape = layer.alpha_shape(points, 0., 1, 0.1).buffer(sand_area).buffer(4)
+    grass_shape = layer.alpha_shape(points, 0.3, 1, 0.1).buffer(grass_area).buffer(4)
+    gravel_shape = layer.alpha_shape(points, 0.12, 0.28, 0.1).buffer(
+        gravel_area).buffer(4)
     points = [x for x in points
-        if shape1.contains(Point(*x)) and layer.get(*x) >= 0.25]
+        if sand_shape.contains(Point(*x)) and layer.get(*x) >= 0.25]
     path = find_path(layer, points, 16)
     mark = path[0]
     # water background
@@ -115,7 +117,7 @@ def render(seed=None, size=512):
     dc.paint()
     # shallow water
     n = 5
-    shape = shape1.simplify(8).buffer(32).buffer(-16)
+    shape = sand_shape.simplify(8).buffer(32).buffer(-16)
     shapes = [shape]
     for _ in range(n):
         shape = shape.simplify(8).buffer(64).buffer(-32)
@@ -132,22 +134,23 @@ def render(seed=None, size=512):
     dc.save()
     dc.set_source_rgb(*Color('#CFC291').rgb)
     for _ in range(5):
-        render_shape(dc, shape1)
+        render_shape(dc, sand_shape)
         dc.fill()
         dc.translate(0, 1)
     dc.restore()
     # sandy land
     dc.set_source_rgb(*Color('#FFFFA6').rgb)
-    render_shape(dc, shape1)
+    render_shape(dc, sand_shape)
     dc.fill()
     # grassy land
     dc.set_source_rgb(*Color('#BDF271').rgb)
-    render_shape(dc, shape2)
+    render_shape(dc, grass_shape)
     dc.fill()
     # dark sand
-    dc.set_source_rgb(*Color('#CFC291').rgb)
-    render_shape(dc, shape3)
-    dc.fill()
+    if "Gravel" in display_which:
+        dc.set_source_rgb(*Color(gravel_color).rgb)
+        render_shape(dc, gravel_shape)
+        dc.fill()
     # path
     dc.set_source_rgb(*Color('#DC3522').rgb)
     render_curve(dc, path, 4)
@@ -168,12 +171,12 @@ def render(seed=None, size=512):
     dc.restore()
     return surface
 
-if __name__ == '__main__':
-    for seed in range(10):
-        print(seed)
-
-        out_dir = Path.cwd().parent / "images"
-        out_dir.mkdir(parents=True, exist_ok=True)
-
-        surface = render(seed)
-        surface.write_to_png(str(out_dir / f'out{seed}.png'))
+# if __name__ == '__main__':
+#     for seed in range(10):
+#         print(seed)
+#
+#         out_dir = Path.cwd().parent / "images"
+#         out_dir.mkdir(parents=True, exist_ok=True)
+#
+#         surface = render(seed)
+#         surface.write_to_png(str(out_dir / f'out{seed}.png'))
