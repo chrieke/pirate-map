@@ -2,6 +2,7 @@ from shapely.geometry import LineString, Polygon, MultiPolygon
 import math
 import random
 
+
 def low_pass(values, alpha):
     result = []
     y = 0.0
@@ -9,6 +10,7 @@ def low_pass(values, alpha):
         y = y - (alpha * (y - x))
         result.append(y)
     return result
+
 
 def normalize(values, new_lo, new_hi):
     result = []
@@ -20,6 +22,7 @@ def normalize(values, new_lo, new_hi):
         result.append(x)
     return result
 
+
 def evenly_spaced(points, spacing):
     result = []
     line = LineString(points)
@@ -30,6 +33,7 @@ def evenly_spaced(points, spacing):
         result.append((point.x, point.y))
         d += spacing
     return result
+
 
 def perturbed(points, spacing, intensity):
     result = []
@@ -46,13 +50,15 @@ def perturbed(points, spacing, intensity):
         result.append((x, y))
     return result
 
+
 def xkcdify(shape, spacing, intensity):
     if isinstance(shape, MultiPolygon):
-        return MultiPolygon([xkcdify(child, spacing, intensity)
-            for child in shape.geoms])
+        return MultiPolygon(
+            [xkcdify(child, spacing, intensity) for child in shape.geoms]
+        )
     elif isinstance(shape, Polygon):
         return Polygon(perturbed(shape.exterior.coords, spacing, intensity))
     elif isinstance(shape, LineString):
         return LineString(perturbed(shape.coords, spacing, intensity))
     else:
-        raise Exception('unsupported shape')
+        raise Exception("unsupported shape")
