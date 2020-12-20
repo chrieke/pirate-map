@@ -4,3 +4,4 @@ pyhull
 pillow
 colour
 cairocffi
+streamlit

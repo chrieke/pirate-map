@@ -90,9 +90,9 @@ def find_path(layer, points, threshold):
         if path:
             return path
 
-def render(seed=None):
+def render(seed=None, size=512):
     random.seed(seed)
-    width = height = 512
+    width = height = size
     scale = 2
     surface = cairo.ImageSurface(cairo.FORMAT_RGB24,
         width * scale, height * scale)
@@ -162,13 +162,14 @@ def render(seed=None):
     # compass
     dc.save()
     dc.translate(48, height - 64)
-    dc.rotate(random.random() * math.pi / 4 - math.pi / 8)
+    # rotates compass
+    #dc.rotate(random.random() * math.pi / 4 - math.pi / 8)
     render_compass(dc)
     dc.restore()
     return surface
 
 if __name__ == '__main__':
-    for seed in range(3):
+    for seed in range(10):
         print(seed)
 
         out_dir = Path.cwd().parent / "images"
