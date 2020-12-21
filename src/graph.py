@@ -1,4 +1,5 @@
 from math import hypot
+
 import heapq
 
 

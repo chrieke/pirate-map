@@ -1,15 +1,15 @@
-from pathlib import Path
 import math
 import random
 from typing import Dict
 
 from colour import Color
-from poisson_disc import poisson_disc
 from shapely.geometry import Polygon, MultiPolygon, Point
-from xkcd import xkcdify
 import cairocffi as cairo
-import graph
-import layers
+
+from .poisson_disc import poisson_disc
+from .xkcd import xkcdify
+from . import graph
+from . import layers
 
 
 def make_layer():

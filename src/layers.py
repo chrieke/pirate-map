@@ -1,7 +1,9 @@
-from alpha_shape import alpha_shape
 from math import hypot
+
 from PIL import Image
 import noise
+
+from .alpha_shape import alpha_shape
 
 
 class Layer(object):
