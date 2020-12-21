@@ -39,23 +39,43 @@ if sec2.button("Random Settings"):
         DEFAULT_CONFIG[name]["area"][0] = random.randint(min, max)  # .astype('uint8')
 
 
-for seed in range(2):
-    print(seed)
+if sec2.button("Reset Settings"):
+    pass
+seed = session.run_id
 
-    out_dir = Path.cwd().parent / "images"
-    out_dir.mkdir(parents=True, exist_ok=True)
+# User configuration
+layer_config = DEFAULT_CONFIG.copy()
+for name, config in DEFAULT_CONFIG.items():
+    col1, col2, col3, col4 = st.beta_columns([1, 1, 4, 1])
 
-    out_file = str(out_dir / f"out{seed}.png")
-
-    surface = render(
-        seed,
-        size=512,
-        scale=2,
-        display_which=display_which,
-        sand=sand,
-        grass=grass,
-        gravel=gravel,
+    # Status
+    layer_config[name]["status"] = col1.checkbox(
+        name.upper(), value=config["status"], key=name + str(session.run_id)
     )
-    surface.write_to_png(out_file)
+    # Color
+    layer_config[name]["color"] = col2.color_picker(
+        label=" ", value=config["color"], key=name + str(session.run_id)
+    )
+    # Area
+    value, min_value, max_value, step = config["area"]
+    layer_config[name]["area"] = col3.slider(
+        label=" ",
+        value=value,
+        min_value=min_value,
+        max_value=max_value,
+        step=step,
+        key=name + str(session.run_id),
+    )
 
-    st.image(out_file, caption=seed, width=400)
+# Render image
+out_dir = Path.cwd().parent / "images"
+out_dir.mkdir(parents=True, exist_ok=True)
+out_file = str(out_dir / f"out.png")
+surface = render(
+    layer_config=layer_config,
+    seed=seed,
+    size=512,
+    scale=2,
+)
+surface.write_to_png(out_file)
+sec1.image(out_file, caption="a", use_column_width=True)
