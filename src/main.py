@@ -1,6 +1,7 @@
 from pathlib import Path
 import math
 import random
+from typing import Dict
 
 from colour import Color
 from poisson_disc import poisson_disc
@@ -99,16 +100,12 @@ def find_path(layer, points, threshold):
 
 
 def render(
-    seed=None,
+    layer_config: Dict,
+    seed=1,
     size=512,
     scale=2,
-    display_which=["Sand", "Grass", "Gravel"],
-    sand_area=-4,
-    grass_area=-8,
-    gravel_area=-12,
 ):
-    # order: sand, grass, gravel
-    random.seed(seed)
+    random.seed(seed)  # Globally set in app
     width = height = size
     surface = cairo.ImageSurface(cairo.FORMAT_RGB24, width * scale, height * scale)
     dc = cairo.Context(surface)
@@ -117,19 +114,33 @@ def render(
     dc.scale(scale, scale)
     layer = make_layer()
 
+    # layers: sand, grass, gravel
     points = poisson_disc(0, 0, width, height, 8, 16)
-    sand_shape = layer.alpha_shape(points, 0.0, 1, 0.1).buffer(sand_area).buffer(4)
-    grass_shape = layer.alpha_shape(points, 0.3, 1, 0.1).buffer(grass_area).buffer(4)
-    gravel_shape = (
-        layer.alpha_shape(points, 0.12, 0.28, 0.1).buffer(gravel_area).buffer(4)
+    sand_shape = (
+        layer.alpha_shape(points, 0.0, 1, 0.1)
+        .buffer(layer_config["sand"]["area"])
+        .buffer(4)
     )
+    grass_shape = (
+        layer.alpha_shape(points, 0.3, 1, 0.1)
+        .buffer(layer_config["grass"]["area"])
+        .buffer(4)
+    )
+    gravel_shape = (
+        layer.alpha_shape(points, 0.12, 0.28, 0.1)
+        .buffer(layer_config["gravel"]["area"])
+        .buffer(4)
+    )
+
+    # treasure path
     points = [
         x for x in points if sand_shape.contains(Point(*x)) and layer.get(*x) >= 0.25
     ]
     path = find_path(layer, points, 16)
     mark = path[0]
+
     # water background
-    dc.set_source_rgb(*Color("#2185C5").rgb)
+    dc.set_source_rgb(*Color(layer_config["water"]["color"]).rgb)
     dc.paint()
     # shallow water
     n = 5
@@ -146,6 +157,7 @@ def render(
         dc.set_source_rgb(*c.rgb)
         render_shape(dc, shape)
         dc.fill()
+
     # height
     dc.save()
     dc.set_source_rgb(*Color("#CFC291").rgb)
@@ -155,16 +167,18 @@ def render(
         dc.translate(0, 1)
     dc.restore()
     # sandy land
-    dc.set_source_rgb(*Color("#FFFFA6").rgb)
-    render_shape(dc, sand_shape)
-    dc.fill()
+    if layer_config["sand"]["status"]:
+        dc.set_source_rgb(*Color(layer_config["sand"]["color"]).rgb)
+        render_shape(dc, sand_shape)
+        dc.fill()
     # grassy land
-    dc.set_source_rgb(*Color("#BDF271").rgb)
-    render_shape(dc, grass_shape)
-    dc.fill()
-    # dark sand
-    if "Gravel" in display_which:
-        dc.set_source_rgb(*Color(gravel_color).rgb)
+    if layer_config["grass"]["status"]:
+        dc.set_source_rgb(*Color(layer_config["grass"]["color"]).rgb)
+        render_shape(dc, grass_shape)
+        dc.fill()
+    # gravel / dark sand
+    if layer_config["gravel"]["status"]:
+        dc.set_source_rgb(*Color(layer_config["gravel"]["color"]).rgb)
         render_shape(dc, gravel_shape)
         dc.fill()
     # path
@@ -186,14 +200,3 @@ def render(
     render_compass(dc)
     dc.restore()
     return surface
-
-
-# if __name__ == '__main__':
-#     for seed in range(10):
-#         print(seed)
-#
-#         out_dir = Path.cwd().parent / "images"
-#         out_dir.mkdir(parents=True, exist_ok=True)
-#
-#         surface = render(seed)
-#         surface.write_to_png(str(out_dir / f'out{seed}.png'))
