@@ -5,3 +5,4 @@ pillow
 colour
 cairocffi
 streamlit
+black
