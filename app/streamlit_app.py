@@ -4,8 +4,8 @@ import time
 
 import streamlit as st
 
-from src.main import render
-from src import SessionState
+from PirateMap.main import render
+import SessionState
 
 # value, min, max,
 DEFAULT_CONFIG = {
@@ -16,7 +16,7 @@ DEFAULT_CONFIG = {
 }
 
 # st.set_page_config(layout="wide")
-st.title("Pirate Map")
+st.title(":pirate_flag: Pirate Map")
 sec1, sec2 = st.beta_columns([2, 1])
 session = SessionState.get(
     run_id=0
