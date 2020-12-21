@@ -4,8 +4,6 @@ pyhull
 pillow
 colour
 cairocffi
-pangocffi
-pangocairocffi
 cairosvg
 streamlit
 black
