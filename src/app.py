@@ -1,7 +1,12 @@
 from pathlib import Path
+import random
+import time
+
 import streamlit as st
 
 from main import render
+import SessionState
+
 # value, min, max,
 DEFAULT_CONFIG = {
     "water": {"status": True, "area": [-4, -50, 5, 1], "color": "#2185C5"},
@@ -17,24 +22,22 @@ session = SessionState.get(
     run_id=0
 )  # see https://gist.github.com/tvst/036da038ab3e999a64497f42de966a92
 
-display_which = st.radio(
-    "Display", options=["Sand", "Grass", "Gravel"], key="display_which"
-)
+# Buttons
+if sec2.button("New Random Map"):
+    session.run_id += 1
+if sec2.button("Random Settings"):
+    t = 1000 * time.time()
+    random.seed(int(t))
 
-sand, grass, gravel = {}, {}, {}
+    random_colors = ["#%06x" % random.randint(0, 0xFFFFFF) for i in range(4)]
+    for name, color in zip(DEFAULT_CONFIG.keys(), random_colors):
+        DEFAULT_CONFIG[name]["color"] = color
 
-sand["area"] = st.slider(
-    "Sand", value=-4, min_value=-50, max_value=10, step=1, key="sand_area"
-)
+    for name in DEFAULT_CONFIG.keys():
+        min = DEFAULT_CONFIG[name]["area"][1]
+        max = DEFAULT_CONFIG[name]["area"][2]
+        DEFAULT_CONFIG[name]["area"][0] = random.randint(min, max)  # .astype('uint8')
 
-grass["area"] = st.slider(
-    "Grass", value=-8, min_value=-50, max_value=10, step=1, key="grass_area"
-)
-
-gravel["area"] = st.slider(
-    "Gravel", value=-12, min_value=-10, max_value=10, step=1, key="gravel_area"
-)
-gravel["color"] = st.color_picker("Gravel Color", label="#CFC291")
 
 for seed in range(2):
     print(seed)
