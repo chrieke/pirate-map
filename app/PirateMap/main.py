@@ -140,7 +140,7 @@ def render(
     mark = path[0]
 
     # water background
-    dc.set_source_rgb(*Color(layer_config["water"]["color"]).rgb)
+    dc.set_source_rgb(*Color("#2185C5").rgb)
     dc.paint()
     # shallow water
     n = 5
