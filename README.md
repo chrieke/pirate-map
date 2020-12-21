@@ -1,6 +1,6 @@
-## Pirate Maps
+# Streamlit Pirate Maps
 
-Procedurally generated pirate treasure maps. X marks the spot!
+A streamlit app to randomly generate pirate treasure maps.
 
 ![Example](http://i.imgur.com/9c0RMuj.png)
 

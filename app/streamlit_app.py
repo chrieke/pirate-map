@@ -21,16 +21,15 @@ st.set_page_config(
     page_title="Pirate Map", page_icon=SKULL_EMOJI_URL, initial_sidebar_state="auto"
 )
 st.title("🏴‍☠️ Pirate Map")
-st.write("Random-generated treasure maps. Customize layer settings in the sidebar.")
+st.write("Generate random treasure maps. Customize layer settings in the sidebar.")
 st.markdown("<br>", unsafe_allow_html=True)
 
 # SIDEBAR
 st.sidebar.markdown(
     """
-# 🏴‍☠️ Pirate Map 
+# Map Settings
 <br>
 
-Select layer color and area size.
 """,
     unsafe_allow_html=True,
 )
