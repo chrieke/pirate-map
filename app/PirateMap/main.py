@@ -167,20 +167,17 @@ def render(
         dc.translate(0, 1)
     dc.restore()
     # sandy land
-    if layer_config["sand"]["status"]:
-        dc.set_source_rgb(*Color(layer_config["sand"]["color"]).rgb)
-        render_shape(dc, sand_shape)
-        dc.fill()
+    dc.set_source_rgb(*Color(layer_config["sand"]["color"]).rgb)
+    render_shape(dc, sand_shape)
+    dc.fill()
     # grassy land
-    if layer_config["grass"]["status"]:
-        dc.set_source_rgb(*Color(layer_config["grass"]["color"]).rgb)
-        render_shape(dc, grass_shape)
-        dc.fill()
+    dc.set_source_rgb(*Color(layer_config["grass"]["color"]).rgb)
+    render_shape(dc, grass_shape)
+    dc.fill()
     # gravel / dark sand
-    if layer_config["gravel"]["status"]:
-        dc.set_source_rgb(*Color(layer_config["gravel"]["color"]).rgb)
-        render_shape(dc, gravel_shape)
-        dc.fill()
+    dc.set_source_rgb(*Color(layer_config["gravel"]["color"]).rgb)
+    render_shape(dc, gravel_shape)
+    dc.fill()
     # path
     dc.set_source_rgb(*Color("#DC3522").rgb)
     render_curve(dc, path, 4)
