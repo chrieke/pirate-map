@@ -1,10 +1,12 @@
 from math import hypot
 import heapq
 
+
 def distance(a, b):
     x1, y1 = a
     x2, y2 = b
     return hypot(x2 - x1, y2 - y1)
+
 
 def shortest_path(graph, start, end):
     queue = [(0, start, [])]
@@ -18,6 +20,7 @@ def shortest_path(graph, start, end):
                 return path
             for (neighbor, c) in graph[v].items():
                 heapq.heappush(queue, (cost + c, neighbor, path))
+
 
 def make_graph(points, threshold, layer=None):
     graph = {}
