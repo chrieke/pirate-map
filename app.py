@@ -4,8 +4,8 @@ import time
 
 import streamlit as st
 
-from main import render
-import SessionState
+from src.main import render
+from src import SessionState
 
 # value, min, max,
 DEFAULT_CONFIG = {
