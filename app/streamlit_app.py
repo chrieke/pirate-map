@@ -16,15 +16,18 @@ DEFAULT_CONFIG = {
     "gravel": {"area": [-10, -20, 0, 1], "color": "#CFC291"},
 }
 
-# PAGE
+
+# PAGE LAYOUT
 st.set_page_config(
     page_title="Pirate Map", page_icon=SKULL_EMOJI_URL, initial_sidebar_state="auto"
 )
 st.title("🏴‍☠️ Pirate Map")
 st.write("Generate random treasure maps. Customize layer settings in the sidebar.")
 st.markdown("<br>", unsafe_allow_html=True)
+page_container = st.beta_container()
 
-# SIDEBAR
+
+# SIDEBAR LAYOUT
 st.sidebar.markdown(
     """
 # Map Settings
@@ -34,16 +37,31 @@ st.sidebar.markdown(
     unsafe_allow_html=True,
 )
 
-# PAGE BUTTONS
+sidebar_container = st.sidebar.beta_container()
+st.sidebar.markdown("-----------------")
+st.sidebar.markdown(
+    """
+The map visualization is using [PirateMap](https://github.com/fogleman/PirateMap) by [fogleman](https://github.com/fogleman).
+
+Explore the streamlit app code in [streamlit-pirate-map](https://github.com/chrieke/streamlit-pirate-map) by [chrieke](https://github.com/chrieke).
+
+[![Star](https://img.shields.io/github/stars/chrieke/pirate-map.svg?label=Star&logo=github&style=social)](https://gitHub.com/jrieke/traingenerator/stargazers)
+&nbsp[![Follow](https://img.shields.io/twitter/follow/chrieke?style=social)](https://www.twitter.com/chrieke)
+""",
+    unsafe_allow_html=True,
+)
+
+
+# BUTTONS
 session = SessionState.get(
     run_id=0
 )  # see https://gist.github.com/tvst/036da038ab3e999a64497f42de966a92
-if st.button("🔄 New Random Map"):
-    session.run_id += 1
-container1 = st.beta_container()
 
-# SIDEBAR BUTTONS
-col_reset, col_random = st.sidebar.beta_columns([2, 3])
+if page_container.button("🔄 New Random Map"):
+    session.run_id += 1
+
+col_reset, col_random = sidebar_container.beta_columns([2, 3])
+sidebar_container.markdown(("------------"))
 if col_random.button("⚙️ Random Size"):
     t = 1000 * time.time()
     random.seed(int(t))
@@ -51,20 +69,21 @@ if col_random.button("⚙️ Random Size"):
         min = DEFAULT_CONFIG[name]["area"][1]
         max = DEFAULT_CONFIG[name]["area"][2]
         DEFAULT_CONFIG[name]["area"][0] = random.randint(min, max)
+
 if col_reset.button("❎ Reset"):
     layer_config = DEFAULT_CONFIG.copy()
 seed = session.run_id
 
-# SIDEBAR SETTINGS
-st.sidebar.markdown("-----------------")
+
+# LAYER SETTINGS
 layer_config = DEFAULT_CONFIG.copy()
-for name, config in DEFAULT_CONFIG.items():
-    col1, col2, col3 = st.sidebar.beta_columns([2, 2, 3])
+for name, config in layer_config.items():
+    col1, col2, col3 = sidebar_container.beta_columns([2, 2, 3])
     # Name
-    col1.write(name.capitalize(), key=name + str(session.run_id))
+    col1.write(name.capitalize(), key="nam" + name + str(session.run_id))
     # Color
     layer_config[name]["color"] = col2.color_picker(
-        label=" ", value=config["color"], key=name + str(session.run_id)
+        label=" ", value=config["color"], key="color" + name + str(session.run_id)
     )
     # Area size
     value, min_value, max_value, step = config["area"]
@@ -75,21 +94,9 @@ for name, config in DEFAULT_CONFIG.items():
         min_value=min_value,
         max_value=max_value,
         step=step,
-        key=name + str(session.run_id),
+        key="size" + name + str(session.run_id),
     )
 
-st.sidebar.markdown(
-    """
-------------
-The map visualization is using [PirateMap](https://github.com/fogleman/PirateMap) by [fogleman](https://github.com/fogleman).
-
-Explore the streamlit app code in [pirate-map](https://github.com/chrieke/pirate-map) by [chrieke](https://github.com/chrieke).
-
-[![Star](https://img.shields.io/github/stars/chrieke/pirate-map.svg?label=Star&logo=github&style=social)](https://gitHub.com/jrieke/traingenerator/stargazers)
-&nbsp[![Follow](https://img.shields.io/twitter/follow/chrieke?style=social)](https://www.twitter.com/chrieke)
-""",
-    unsafe_allow_html=True,
-)
 
 # RENDER IMAGE
 out_dir = Path.cwd().parent / "images"
@@ -102,4 +109,4 @@ surface = render(
     scale=2,
 )
 surface.write_to_png(out_file)
-container1.image(out_file, caption=" ", width=650)
+page_container.image(out_file, caption=" ", width=650)
