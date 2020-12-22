@@ -1,4 +1,4 @@
-# Streamlit Pirate Maps
+# 🏴‍☠️ Streamlit Pirate Maps
 
 A Streamlit app that generates random pirate treasure maps. Live on [streamlit/streamlit-pirate-map](https://share.streamlit.io/chrieke/streamlit-pirate-map/app/streamlit_app.py).
 
